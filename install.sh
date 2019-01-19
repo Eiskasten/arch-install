@@ -5,9 +5,6 @@
 # ============== #
 #
 # Short install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
-#
-# @authors @Eiskasten, @re1
-# @version 2018-11-03
 
 source install.conf		# load install script configuration
 

@@ -1,3 +1,3 @@
 # Arch install script
 
-Another Arch Linux installation script.
+Another Arch Linux installation script
