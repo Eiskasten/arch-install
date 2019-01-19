@@ -1,2 +1,3 @@
-# arch-install
-An installationscript for Arch Linux
+# Arch install script
+
+Another Arch Linux installation script.
