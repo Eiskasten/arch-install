@@ -1,10 +1,11 @@
 #!/bin/sh
+#       _             _       _     _
+#      / \   _ __ ___| |__   | |   (_)_ __  _   ___  __
+#     / _ \ | '__/ __| '_ \  | |   | | '_ \| | | \ \/ /
+#    / ___ \| | | (__| | | | | |___| | | | | |_| |>  <
+#   /_/   \_\_|  \___|_| |_| |_____|_|_| |_|\__,_/_/\_\
 #
-# ============== #
-#   Arch Linux   #
-# ============== #
-#
-# Short install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
+#   Install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
 
 source install.conf		# load install script configuration
 
