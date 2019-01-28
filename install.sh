@@ -6,7 +6,7 @@
 #   /_/   \_\_|  \___|_| |_| |_____|_|_| |_|\__,_/_/\_\
 #
 #   Install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
-#   TODO: Do not install a boot manager for UEFI systems and enable secure boot
+#   TODO: Implement secure boot preparations
 
 source install.conf		# load install script configuration
 
