@@ -6,6 +6,7 @@
 #   /_/   \_\_|  \___|_| |_| |_____|_|_| |_|\__,_/_/\_\
 #
 #   Install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
+#   TODO: Do not install a boot manager for UEFI systems and enable secure boot
 
 source install.conf		# load install script configuration
 
@@ -24,8 +25,8 @@ sfdisk $DISK < sfdisk.in    # create partitions using config from sfdisk.in
 # confirm optional system encryption
 if [ -z ${CRYPT_ROOT+x} ]
 then
-	cryptsetup luksFormat -M luks2 $ROOT_PART   # encrypt partition with LUKS
-	cryptsetup open $ROOT_PART $CRYPT_ROOT -d   # map decrypted partition to crypt root
+    cryptsetup luksFormat -M luks2 $ROOT_PART   # encrypt partition with LUKS
+    cryptsetup open $ROOT_PART $CRYPT_ROOT -d   # map decrypted partition to crypt root
 
     pvcreate /dev/mapper/$CRYPT_ROOT            # create LVM physical volume on LUKS encrypted root
     vgcreate vg-system /dev/mapper/$CRYPT_ROOT  # create LVM volume group for the system
@@ -91,14 +92,8 @@ options="root=$ROOT_PART rootflags=subvol=@"    # set root partition and mount o
 if [ -d '/sys/firmware/efi' ]           # check for UEFI support
 then
     pacstrap /mnt efibootmgr     	    # install EFI boot utility
-    arch-chroot /mnt bootctl --path=/boot install
-    # add boot loader entry configuration
-    echo 'title Arch Linux' >> /mnt/boot/loader/entries/arch-linux.conf
-    echo 'linux /vmlinuz-linux' >> /mnt/boot/loader/entries/arch-linux.conf
-    echo 'initrd /initramfs-linux.img' >> /mnt/boot/loader/entries/arch-linux.conf
-    echo "options $options" >> /mnt/boot/loader/entries/arch-linux.conf
-    # make arch-linux the default entry
-    echo "default arch-linux" > /mnt/boot/loader/loader.conf
+    # edd UEFI boot entry with kernel parameters
+    efibootmgr -d $DISK -p 1 -c -L 'Arch Linux' -l /vmlinuz-linux -u "$options initrd=\\initramfs-linux.img"
 else
     pacstrap /mnt grub                  # install grub boot loader
     # set GRUB_CMDLINE_LINUX variable for grub
