@@ -141,8 +141,9 @@ sed -e "s/^\(MAKEFLAGS\s*=\s*\).*$/\1"-j$((1+$(cat /proc/cpuinfo | grep processo
 
 # install packages set in install.conf
 pacstrap /mnt ${PACKAGES[@]}
-# enable systemd units set in install.conf
-arch-chroot /mnt systemctl enable ${$SYSTEMD_UNITS[@]}
+# enable and mask systemd units set in install.conf
+arch-chroot /mnt systemctl enable ${$SYSTEMD_ENABLE[@]}
+arch-chroot /mnt systemctl mask ${$SYSTEMD_MASK[@]}
 
 
 # ---------------------- #
