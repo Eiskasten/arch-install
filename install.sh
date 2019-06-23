@@ -8,7 +8,7 @@
 #   Install guide / script for Arch Linux with LUKS encryption and BTRFS partitions
 #   TODO: Implement secure boot preparations
 
-source install.conf		# load install script configuration
+source ./install.conf       # load install script configuration
 
 
 # ---------------- #
