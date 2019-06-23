@@ -57,7 +57,7 @@ umount /mnt                         # unmount root partition
 mount $ROOT_PART -o subvol=@ /mnt   # mount Btrfs root subvolume
 
 # create mount points for Btrfs subvolumes
-mkdir -p {.snapshots,home,var/cache/pacman/pkg}
+mkdir -p {/mnt/.snapshots,/mnt/home,/mnt/var/cache/pacman/pkg}
 mount $ROOT_PART -o subvol=@home /mnt/home
 mount $ROOT_PART -o subvol=@pkg /mnt/var/cache/pacman/pkg
 mount $ROOT_PART -o subvol=@snapshots /mnt/.snapshots
@@ -150,7 +150,7 @@ arch-chroot /mnt systemctl mask ${$SYSTEMD_MASK[@]}
 #   User configuration   #
 # ---------------------- #
 # add new user with wheel, audio and video privileges
-arch-chroot /mnt useradd -mg users -G wheel,audio,video -s $SHELL_PATH $USERNAME
+arch-chroot /mnt useradd -m -G wheel,audio,video -s $SHELL_PATH $USERNAME
 arch-chroot /mnt passwd $USERNAME 	# set password for user
 
 # allow members of group wheel to execute any command
