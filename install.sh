@@ -10,20 +10,19 @@
 
 source ./install.conf       # load install script configuration
 
-
 # ---------------- #
 #   Partitioning   #
 # ---------------- #
 # Create partitions from sfdisk (start,size,type,bootable) in the following order:
-echo ",$BOOT_PART_SIZE,U,*" >> sfdisk.in    # create boot partition
+echo ",$BOOT_SIZE,U,*" > sfdisk.in  # create boot partition
 # only create swap partition without encryption
-[ ! -z ${CRYPT_ROOT+x} ] && echo ",$SWAP_PART_SIZE,S" >> sfdisk.in
+[ -z ${CRYPT_ROOT+x} ] && echo ",$SWAP_SIZE,S" >> sfdisk.in
 
 echo ";" >> sfdisk.in       # create system partition from remaining space
 sfdisk $DISK < sfdisk.in    # create partitions using config from sfdisk.in
 
 # confirm optional system encryption
-if [ -z ${CRYPT_ROOT+x} ]
+if [ ! -z ${CRYPT_ROOT+x} ]
 then
     cryptsetup luksFormat -M luks2 $ROOT_PART   # encrypt partition with LUKS
     cryptsetup open $ROOT_PART $CRYPT_ROOT -d   # map decrypted partition to crypt root
@@ -79,7 +78,7 @@ genfstab -Lp /mnt >> /mnt/etc/fstab 			# generate fstab entries to /mnt/etc/fsta
 line=$(grep '^HOOKS' /mnt/etc/mkinitcpio.conf | cut -d : -f 1)s
 hooks='btrfs'
 # add encrypt lvm2 and resume hooks when using encryption
-[ -z ${CRYPT_ROOT+x} ] && hooks="encrypt lvm2 $hooks resume"
+[ ! -z ${CRYPT_ROOT+x} ] && hooks="encrypt lvm2 $hooks resume"
 # add custom hooks before filesystems hooks in mkinitcpio
 sed -i "$line/filesystems/i $hooks" /mnt/etc/mkinitcpio.conf
 arch-chroot /mnt mkinitcpio -p linux            # regenerate initramfs
@@ -87,7 +86,7 @@ arch-chroot /mnt mkinitcpio -p linux            # regenerate initramfs
 uuid=$(blkid -s UUID -o value $SYSTEM_PART)     # get system uuid to reference in kernel options
 options="root=$ROOT_PART rootflags=subvol=@"    # set root partition and mount options for boot
 # add more kernel options for encrypted system including the uuid of the encrypted device
-[ -z ${CRYPT_ROOT+x} ] && options="cryptdevice=UUID=$uuid:$CRYPT_ROOT $options resume=$SWAP_PART"
+[ ! -z ${CRYPT_ROOT+x} ] && options="cryptdevice=UUID=$uuid:$CRYPT_ROOT $options resume=$SWAP_PART"
 
 if [ -d '/sys/firmware/efi' ]           # check for UEFI support
 then
@@ -99,7 +98,7 @@ else
     # set GRUB_CMDLINE_LINUX variable for grub
     sed -i "/GRUB_CMDLINE_LINUX=/a \"$options\"" /mnt/etc/default/grub
     # enable grub cryptodisk support when system is encrypted
-    [ -z ${CRYPT_ROOT+x} ] && sed -i '/GRUB_ENABLE_CRYPTODISK=y/s/^#//' /mnt/etc/default/grub
+    [ ! -z ${CRYPT_ROOT+x} ] && sed -i '/GRUB_ENABLE_CRYPTODISK=y/s/^#//' /mnt/etc/default/grub
     # generate grub config and install to $boot
     arch-chroot /mnt grub-install --bootloader-id=grub
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
